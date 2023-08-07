@@ -119,12 +119,11 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 	// if true, allow tx. If not, return error
 
 	// RESEARCH: hash probably -> hash(isAllowed, hash(msg.From)))
-	// REFERENCE: https://github.com/orkunkilic/custom-subnet-evm/blob/orkun/end-hook/precompile/gas_revenue.go#L233
 	// This repo access a mapping with a hash of the address of the sender. just like we want to do.
 
 	// TODO: two constants for admin address and contract address
 	// TODO: use CREATE2 to learn address of contract in another chain.
-	isAllowedToTx := statedb.GetState(contractAddress, crypto.Keccak256Hash([]byte("isAllowed")))
+	isAllowedToTx := statedb.GetState(contractAddress, common.BytesToHash(append([]byte("isVerified"), msg.From.Bytes()...)))
 	// returns hash of true if allowed, false if not (NOT SURE MAKE RESEARCH)
 	if isAllowedToTx.Big().Cmp(common.Big1) != 0 {
 		return nil, fmt.Errorf("not allowed to send transactions")
