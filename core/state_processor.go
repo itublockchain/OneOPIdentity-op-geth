@@ -30,6 +30,11 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 )
 
+const (
+	contractAddress string = "0x00000000"
+	adminAddress    string = "0x00000000"
+)
+
 // StateProcessor is a basic Processor, which takes care of transitioning
 // state from one point to another.
 //
@@ -108,6 +113,21 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 	nonce := tx.Nonce()
 	if msg.IsDepositTx && config.IsOptimismRegolith(evm.Context.Time) {
 		nonce = statedb.GetNonce(msg.From)
+	}
+
+	// Access mapping of a smart contract and get the value
+	// if true, allow tx. If not, return error
+
+	// RESEARCH: hash probably -> hash(isAllowed, hash(msg.From)))
+	// REFERENCE: https://github.com/orkunkilic/custom-subnet-evm/blob/orkun/end-hook/precompile/gas_revenue.go#L233
+	// This repo access a mapping with a hash of the address of the sender. just like we want to do.
+
+	// TODO: two constants for admin address and contract address
+	// TODO: use CREATE2 to learn address of contract in another chain.
+	isAllowedToTx := statedb.GetState(contractAddress, crypto.Keccak256Hash([]byte("isAllowed")))
+	// returns hash of true if allowed, false if not (NOT SURE MAKE RESEARCH)
+	if isAllowedToTx.Big().Cmp(common.Big1) != 0 {
+		return nil, fmt.Errorf("not allowed to send transactions")
 	}
 
 	// Apply the transaction to the current state (included in the env).
