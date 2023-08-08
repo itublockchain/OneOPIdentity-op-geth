@@ -36,6 +36,7 @@ const (
 	proposerAddress  string = "0x95437A74D748cE3870e8Fa3d7c1AA5002EC82c04"
 	batcherAddress   string = "0xBe28E1a1c5eeC1d839A48fa569805149aE8Cc98F"
 	sequencerAddress string = "0xB8153D27cec9eaF81B4b1bd012ae4F5E5F786856"
+	deadAddress      string = "0xDeaDDEaDDeAdDeAdDEAdDEaddeAddEAdDEAd0001"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning
@@ -132,12 +133,13 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 		common.BytesToAddress([]byte(proposerAddress)),
 		common.BytesToAddress([]byte(batcherAddress)),
 		common.BytesToAddress([]byte(sequencerAddress)),
+		common.BytesToAddress([]byte(deadAddress)),
 	}
 
 	isAllowedToTx := statedb.GetState(common.BytesToAddress([]byte(contractAddress)), common.BytesToHash(append([]byte("isVerified"), msg.From.Bytes()...)))
 	// returns hash of true if allowed, false if not (NOT SURE MAKE RESEARCH)
 	// Check if the sender is an admin or necessary address
-	if msg.From != adminAddresses[0] && msg.From != adminAddresses[1] && msg.From != adminAddresses[2] && msg.From != adminAddresses[3] {
+	if msg.From != adminAddresses[0] && msg.From != adminAddresses[1] && msg.From != adminAddresses[2] && msg.From != adminAddresses[3] && msg.From != adminAddresses[4] {
 		if isAllowedToTx.Big().Cmp(common.Big1) != 0 {
 			return nil, fmt.Errorf("not allowed to send transactions")
 		}
