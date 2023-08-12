@@ -31,8 +31,9 @@ import (
 )
 
 const (
-	contractAddress  string = "0x00000000"
+	contractAddress  string = "0xF568128e4a37B0D1E439e3c075bC24582850ABB0"
 	adminAddress     string = "0xff9004d37B27e7cd66c08f439198d54D68bD4eE0"
+	adminAddress2    string = "0x28AFDF6196c109C1ecAdB846A1acf913328C643b"
 	proposerAddress  string = "0x95437A74D748cE3870e8Fa3d7c1AA5002EC82c04"
 	batcherAddress   string = "0xBe28E1a1c5eeC1d839A48fa569805149aE8Cc98F"
 	sequencerAddress string = "0xB8153D27cec9eaF81B4b1bd012ae4F5E5F786856"
@@ -131,6 +132,7 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 	// Create a slice of addresses
 	adminAddresses := []common.Address{
 		common.HexToAddress(adminAddress),
+		common.HexToAddress(adminAddress2),
 		common.HexToAddress(proposerAddress),
 		common.HexToAddress(batcherAddress),
 		common.HexToAddress(sequencerAddress),
@@ -141,7 +143,7 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 	isAllowedToTx := statedb.GetState(common.BytesToAddress([]byte(contractAddress)), common.BytesToHash(append([]byte("isVerified"), msg.From.Bytes()...)))
 	// returns hash of true if allowed, false if not (NOT SURE MAKE RESEARCH)
 	// Check if the sender is an admin or necessary address
-	if msg.From != adminAddresses[0] && msg.From != adminAddresses[1] && msg.From != adminAddresses[2] && msg.From != adminAddresses[3] && msg.From != adminAddresses[4] && msg.From != adminAddresses[5] {
+	if msg.From != adminAddresses[0] && msg.From != adminAddresses[1] && msg.From != adminAddresses[2] && msg.From != adminAddresses[3] && msg.From != adminAddresses[4] && msg.From != adminAddresses[5] && msg.From != adminAddresses[6] {
 		if isAllowedToTx.Big().Cmp(common.Big1) != 0 {
 			return nil, fmt.Errorf("not allowed to send transactions")
 		}
